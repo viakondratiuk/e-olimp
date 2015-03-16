@@ -1,36 +1,33 @@
 from functools import reduce
-n, count, smallest = int(4), 0, None
+from itertools import permutations
+n = int(input())
 
-if n == 1:
-    interval = range(0, 10 ** n)
-else:
-    interval = range(10 ** (n - 1), 10 ** n)
-    
-for i in interval:
-    l = list(map(int, str(i)))
-    if 0 in l:
-        continue
-    s = sum(l)
-    m = reduce(lambda x, y: x * y, l)
+def getCountAndSmallest(n):
+   if n == 0:
+       return (0, 0)
+   elif n == 1:
+       return (10, 0)
+           
+   valid, res = (), ()
+   if n in (2, 3):
+       interval, z, prefix = range(0, 99), 2, (n-2) * '1'
+   else:
+       interval, z, prefix = range(0, 999), 3, (n-3) * '1'
+       
+   for i in interval:
+       t = tuple(map(int, prefix + str(i).zfill(z)))
+       if 0 in t:
+           continue
+       s = sum(t)
+       m = reduce(lambda x, y: x * y, t)
+       if s == m:            
+           valid += (t,)
 
-    if s == m:
-        count += 1
-        print i
-        if smallest is None:
-            smallest = i
+   for i in valid:
+       if i not in res:
+           res += tuple(set(permutations(i)))
 
-print(count, smallest)
-
-'''
-10
-11
-12
-13
-
-1 + 2 + 2(5) = 1 * 2 * 2(4)
-1 + 2 + 3(6) = 1 * 2 * 3(6)
-1 + 2 + 4(7) = 1 * 2 * 4(8)
-1 + 2 + 5(8) = 1 * 2 * 5(10)
-2 + 5 + 4(11) = 2 * 5 * 4(40)
-2 + 5 + 5(12) = 2 * 5 * 5(50)
-'''
+   return(len(res), reduce(lambda rst, d: rst * 10 + d, min(res)))    
+   
+res = getCountAndSmallest(n)
+print(res[0], res[1])
